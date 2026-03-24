@@ -13,7 +13,7 @@ Sistem ekstraksi data NIK KTP dan Nomor NPWP Indonesia berbasis AI (EasyOCR) yan
 ### 1. Via Termux (Android)
 ```bash
 pkg install git -y
-git clone [URL_REPOMU]
+git clone [https://github.com/123tool/Local-OCR-KTP-NPWP-API.git]
 cd spy-e-ocr
 chmod +x install.sh
 ./install.sh
