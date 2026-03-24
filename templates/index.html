@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPY-E | OCR Identity Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #020617); 
+            color: #f1f5f9; 
+            font-family: 'Rajdhani', sans-serif;
+            min-height: screen;
+        }
+        .glass { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+
+    <div class="glass w-full max-w-2xl rounded-[2rem] overflow-hidden">
+        <div class="p-8 bg-blue-600/10 border-b border-white/5 text-center">
+            <h1 class="text-4xl font-bold tracking-[0.2em] text-blue-500">SPY-E <span class="text-white">SYSTEM</span></h1>
+            <p class="text-slate-400 text-xs mt-1 uppercase tracking-widest">Local OCR • High Precision • No Cloud</p>
+        </div>
+
+        <div class="p-8 space-y-8">
+            <div class="flex p-1 bg-slate-900 rounded-2xl border border-slate-800">
+                <button onclick="setType('ktp')" id="btn-ktp" class="flex-1 py-3 rounded-xl transition-all duration-300 font-bold bg-blue-600 text-white">KTP</button>
+                <button onclick="setType('npwp')" id="btn-npwp" class="flex-1 py-3 rounded-xl transition-all duration-300 font-bold text-slate-500">NPWP</button>
+            </div>
+
+            <div onclick="document.getElementById('fileInput').click()" class="group border-2 border-dashed border-slate-700 rounded-3xl p-12 text-center hover:border-blue-500 transition-all cursor-pointer bg-slate-800/20">
+                <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileChange()">
+                <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">📷</div>
+                <p id="fileLabel" class="text-slate-400 font-medium">Klik atau seret foto ke sini</p>
+                <p id="fileName" class="text-blue-400 mt-2 text-sm font-mono italic"></p>
+            </div>
+
+            <button onclick="startProcessing()" id="processBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-900/40 transition-all active:scale-95">MULAI EKSTRAKSI</button>
+
+            <div id="loader" class="hidden text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mb-2"></div>
+                <p class="text-sm italic text-slate-400 shimmer">AI sedang membaca data...</p>
+            </div>
+
+            <div id="resultBox" class="hidden space-y-4 animate-in fade-in zoom-in duration-500">
+                <div class="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
+                    <label class="text-[10px] uppercase tracking-widest text-emerald-500 font-bold">Hasil Deteksi ID:</label>
+                    <h2 id="resID" class="text-3xl font-mono text-white mt-1 break-all"></h2>
+                </div>
+                
+                <details class="group bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                    <summary class="p-4 cursor-pointer text-xs font-bold text-slate-500 hover:bg-slate-800 transition">LIHAT RAW DATA (JSON)</summary>
+                    <pre id="resRaw" class="p-4 text-[10px] text-blue-300 overflow-auto max-h-48 leading-relaxed font-mono"></pre>
+                </details>
+            </div>
+        </div>
+
+        <div class="p-4 text-center text-[10px] text-slate-600 border-t border-white/5 uppercase tracking-widest">
+            Developed by SPY-E Labs &copy; 2026
+        </div>
+    </div>
+
+    <script>
+        let currentType = 'ktp';
+
+        function setType(type) {
+            currentType = type;
+            const isKTP = type === 'ktp';
+            document.getElementById('btn-ktp').className = isKTP ? 'flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold' : 'flex-1 py-3 rounded-xl text-slate-500 font-bold';
+            document.getElementById('btn-npwp').className = !isKTP ? 'flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold' : 'flex-1 py-3 rounded-xl text-slate-500 font-bold';
+        }
+
+        function handleFileChange() {
+            const file = document.getElementById('fileInput').files[0];
+            if (file) {
+                document.getElementById('fileName').innerText = file.name;
+                document.getElementById('fileLabel').innerText = "File Terpilih!";
+            }
+        }
+
+        async function startProcessing() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) return alert("Pilih foto terlebih dahulu!");
+
+            const btn = document.getElementById('processBtn');
+            const loader = document.getElementById('loader');
+            const resultBox = document.getElementById('resultBox');
+
+            btn.classList.add('hidden');
+            resultBox.classList.add('hidden');
+            loader.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch(`/extract?type=${currentType}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.error) throw new Error(data.error);
+
+                document.getElementById('resID').innerText = data.detected_id;
+                document.getElementById('resRaw').innerText = JSON.stringify(data, null, 2);
+                resultBox.classList.remove('hidden');
+            } catch (err) {
+                alert("Gagal: " + err.message);
+            } finally {
+                loader.classList.add('hidden');
+                btn.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
