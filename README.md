@@ -18,3 +18,20 @@ cd spy-e-ocr
 chmod +x install.sh
 ./install.sh
 python app.py
+
+```
+### 2. Via Windows (CMD/PowerShell)
+​Install Python 3.10+
+​Jalankan perintah:
+```bash
+pip install flask easyocr werkzeug opencv-python-headless
+python app.py
+
+```
+### 📖 Cara Penggunaan
+​Jalankan python app.py.
+​Buka browser dan akses http://localhost:5000.
+​Pilih tipe dokumen (KTP/NPWP).
+​Upload foto dokumen (pastikan cahaya cukup & tulisan terbaca).
+​Klik Mulai Ekstraksi.
+
