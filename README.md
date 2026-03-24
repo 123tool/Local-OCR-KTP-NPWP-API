@@ -29,9 +29,9 @@ python app.py
 
 ```
 ### 📖 Cara Penggunaan
-​Jalankan python app.py.
-​Buka browser dan akses http://localhost:5000.
-​Pilih tipe dokumen (KTP/NPWP).
-​Upload foto dokumen (pastikan cahaya cukup & tulisan terbaca).
-​Klik Mulai Ekstraksi.
+1. ​Jalankan python app.py
+2. ​Buka browser dan akses http://localhost:5000.
+3. ​Pilih tipe dokumen (KTP/NPWP).
+4. ​Upload foto dokumen (pastikan cahaya cukup & tulisan terbaca).
+5. ​Klik Mulai Ekstraksi.
 
